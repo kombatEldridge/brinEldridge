@@ -11,7 +11,6 @@
 
 import numpy as np
 import pandas as pd
-from IPython.display import clear_output
 import os
 import matplotlib.pyplot as plt
 from pylab import *
