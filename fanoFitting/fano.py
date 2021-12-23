@@ -72,7 +72,6 @@ def processData(x, y, lamdaF, lamdaL, gam):
     if(popt_nfano[0]<0):
         popt_nfano[0]=-popt_nfano[0]
         popt_nfano[2]=-popt_nfano[2]
-        print("**", end='')
 
     #outputs q, gamma, x0, fitness, nFano y values, a scalar, original x data, scaled y data (in that order)
     return(popt_nfano[2], popt_nfano[0], popt_nfano[1], fitness, nFano(x, *popt_nfano), poptsFano[3], x, y)
