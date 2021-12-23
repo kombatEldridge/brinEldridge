@@ -1,27 +1,11 @@
-# User inputs one of the following file types (AverageEsphere, AverageEXTABS, or Orientation)
-# System detects which file type it is
-    # System will use pandas to read amount of columns in file (AverageEsphere (21), AverageEXTABS (13), or Orientation (10))
-# System will load and transform the data into series of lists of the x values and the multiple y values
-# While user still wants processing:
-    # System will ask (depending on which file type) which data set to be processed
-    # User inputs which column to be processed
-    # User imputs lamda window (lamdaF and lamdaL) where Fano is found
-    # System outputs Fano parameters to user
-# User inputs 'x' to exit.
-
 import numpy as np
 import pandas as pd
 import os
-import matplotlib.pyplot as plt
 from pylab import *
 import scipy.constants as sc
 import scipy as scipy
 from scipy import optimize
-import matplotlib
-from matplotlib.ticker import AutoMinorLocator
-from matplotlib import gridspec
-import matplotlib.ticker as ticker
-%matplotlib inline
+from colorama import Fore, Style
 
 class ySeries:
     def __init__(self, values, name):
@@ -93,15 +77,9 @@ def processData(x, y, lamdaF, lamdaL, gam):
     #outputs q, gamma, x0, fitness, nFano y values, a scalar, original x data, scaled y data (in that order)
     return(popt_nfano[2], popt_nfano[0], popt_nfano[1], fitness, nFano(x, *popt_nfano), poptsFano[3], x, y)
 
-print("Fano Fitting processor\n\nPlease make sure your file is formatted as an output file from the following list:\n\tAverageEsphere\n\tAverageEXTABS\n\tOrientation\n")
+#Introductions. Comment this line if user wants to conserve screen space on command line.
+#print("Fano Fitting processor\n\nPlease make sure your file is formatted as an output file from the following list:\n\tAverageEsphere\n\tAverageEXTABS\n\tOrientation\n")
 
-# Ask the user for file name of file with Fano data
-
-######
-# detect text files in directory
-# give user options for which one
-######
-# return all files as a list
 files = []
 fileCount = 0
 print("The following text files have been detected:\n")
@@ -112,11 +90,10 @@ for file in os.listdir(os.getcwd()):
         print("[",fileCount,"] ",file)
         files.append(file)
         fileCount += 1
-
-filename = input("Please select file number:\t")
+filename = int(input("\nPlease select file number:"))
 path = os.getcwd() + "/" + files[filename] #path of the file
-# path = '/Users/brintoneldridge/Downloads/Research/Data/bldrdge1/AverageEXTABS/2nm.txt'
 data = pd.read_csv(path, sep='\t', header=None, skiprows=1).values
+
 columns = len(data[:][0])
 if(columns == 21):
     fileType = 0 #AverageEspheres
@@ -141,66 +118,66 @@ else:
 if(fileType == 0):
     x = data[:,0] #Column 0 is always the wavelength #x1a
     yData = []
-    yData.append(ySeries(data[:,6], "E^2 on the 1st Nano Particle longitudinally"))
-    yData.append(ySeries(data[:,10], "E^2 on the 2nd Nano Particle longitudinally"))
-    yData.append(ySeries(data[:,14], "E^2 on the 1st Nano Particle transversely"))
-    yData.append(ySeries(data[:,18], "E^2 on the 2nd Nano Particle transversely"))
+    yData.append(ySeries(data[:,6], "E^2 on the 1st nanoparticle measured longitudinally"))
+    yData.append(ySeries(data[:,10], "E^2 on the 2nd nanoparticle measured longitudinally"))
+    yData.append(ySeries(data[:,14], "E^2 on the 1st nanoparticle measured transversely"))
+    yData.append(ySeries(data[:,18], "E^2 on the 2nd nanoparticle measured transversely"))
 elif(fileType == 1):
     x = data[:,0]  #Column 0 is always the wavelength #x2a
     yData = []
-    yData.append(ySeries(data[:,5], "Qext on the 1st Nano Particle longitudinally"))
-    yData.append(ySeries(data[:,6], "Qabs on the 1st Nano Particle longitudinally"))
-    yData.append(ySeries(data[:,7], "Qext on the 2nd Nano Particle longitudinally"))
-    yData.append(ySeries(data[:,8], "Qabs on the 2nd Nano Particle longitudinally"))
-    yData.append(ySeries(data[:,9], "Qext on the 1st Nano Particle transversely"))
-    yData.append(ySeries(data[:,10], "Qabs on the 1st Nano Particle transversely"))
-    yData.append(ySeries(data[:,11], "Qext on the 2nd Nano Particle transversely"))
-    yData.append(ySeries(data[:,12], "Qabs on the 2nd Nano Particle transversely"))
+    yData.append(ySeries(data[:,5], "Qext on the 1st nanoparticle measured longitudinally"))
+    yData.append(ySeries(data[:,6], "Qabs on the 1st nanoparticle measured longitudinally"))
+    yData.append(ySeries(data[:,7], "Qext on the 2nd nanoparticle measured longitudinally"))
+    yData.append(ySeries(data[:,8], "Qabs on the 2nd nanoparticle measured longitudinally"))
+    yData.append(ySeries(data[:,9], "Qext on the 1st nanoparticle measured transversely"))
+    yData.append(ySeries(data[:,10], "Qabs on the 1st nanoparticle measured transversely"))
+    yData.append(ySeries(data[:,11], "Qext on the 2nd nanoparticle measured transversely"))
+    yData.append(ySeries(data[:,12], "Qabs on the 2nd nanoparticle measured transversely"))
 elif(fileType == 2):
     x = data[:,0] #Column 0 is always the wavelength #x3a
     yData = []
-    yData.append(ySeries(data[:,1], "Qext longitudinally"))
-    yData.append(ySeries(data[:,2], "Qabs longitudinally"))
-    yData.append(ySeries(data[:,3], "Qsca longitudinally"))
-    yData.append(ySeries(data[:,4], "Qext transversely"))
-    yData.append(ySeries(data[:,5], "Qabs transversely"))
-    yData.append(ySeries(data[:,6], "Qsca transversely"))
+    yData.append(ySeries(data[:,1], "Qext measured longitudinally"))
+    yData.append(ySeries(data[:,2], "Qabs measured longitudinally"))
+    yData.append(ySeries(data[:,3], "Qsca measured longitudinally"))
+    yData.append(ySeries(data[:,4], "Qext measured transversely"))
+    yData.append(ySeries(data[:,5], "Qabs measured transversely"))
+    yData.append(ySeries(data[:,6], "Qsca measured transversely"))
 else:
     print("Error: File not formatted correctly.")
     quit()
 
 # Ask the user to identify the interval in which the user thinks the fano resonance is in
-print("Enter 'd' to set value to default.")
-lamdaF = input("First wavelength of the interval (default: 350nm):")
-if(lamdaF == 'd'):
+lamdaF = input("\nFirst wavelength of the interval (default: 350nm):")
+if(lamdaF == ""):
     lamdaF = 350
 else:
     lamdaF = int(lamdaF)
 lamdaL = input("Last wavelength of the interval (default: 450nm):")
-if(lamdaL == 'd'):
+if(lamdaL == ""):
     lamdaL = 450
 else:
     lamdaL = int(lamdaL)
 gam = input("Guess for gamma (default: 5e-21):")
-if(gam == 'd'):
+if(gam == ""):
     gam = 5e-21
 else:
     gam = int(gam)
 
 dataRequest = ""
-print("Program has detected a %s file with %d data sets\n" % (fileTypeName, columnAmount))
+yNumber = []
+print("\nProgram has detected that your file has %d data sets\n" % (columnAmount))
 while(dataRequest != "x"):
-    print("Please select which series to process?")
+    print("Please select which series to process (enter any other character to exit):")
     for index in range(0, len(yData)):
         print("[",index,"] ",yData[index].name)
+        if(index not in yNumber): yNumber.append(index)
     dataRequest = input()
-    if(dataRequest == 'x'):
-        quit()
-    else:
+    try:
         dataRequest = int(dataRequest)
+    except ValueError:
+        quit()
+    if(dataRequest not in yNumber):
+        quit()
     fano = processData(x, yData[dataRequest].values, lamdaF, lamdaL, gam)
-    print("q = %0.5f" % (fano[0]))
-    print("gamma = %.3e" % (fano[1]))
-    print("x0 = %0.5f" % (fano[2]))
-    print("a scalar = %0.5f" % (fano[5]))
-    print("Fitness = %0.5f" % (fano[3]))
+    print(Fore.YELLOW + "\nq = %0.5f\ngamma = %.3e\nx0 = %0.5f\na scalar = %0.5f\nFitness = %0.5f\n" % (fano[0], fano[1], fano[2], fano[5], fano[3]))
+    print(Style.RESET_ALL)
