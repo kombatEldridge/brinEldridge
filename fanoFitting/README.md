@@ -19,12 +19,19 @@ For files not of the three given types, it is possible to edit *fano.py* to acco
 * In all, follow the format of the current code to insert the new file type.
 
 ## Fano equation
-## &emsp; $\sigma=\frac{([\frac{2hc(\frac{1}{\lambda}-\frac{1}{\lambda_{0}})}{\gamma}]+q)^2}{1+(\frac{2hc(\frac{1}{\lambda}-\frac{1}{\lambda_{0}})}{\gamma})^2}$
+## &emsp; $y=\frac{\left[\left(2hc\frac{\left(\frac{1}{\lambda}-\frac{1}{\lambda_0}\right)}{\Gamma}\right)+q\right]^2}{\left(2hc\frac{\left(\frac{1}{\lambda}-\frac{1}{\lambda_0}\right)}{\Gamma}\right)^2+1}$
 
 ## Variable types
 * $\gamma$ must be positive and on the order of at least $10^{-20}$
 * $\lambda_{0}$ must be positive and between the two peaks of the fano curve
 * $q$ can be positive or negative but signifies a fano resonance between the values of $[-10,10]$ 
+
+## Fitness Measurement
+Fitness is measured as an R $^2$ value where:\
+&emsp;R $^2=1-\frac{SSE}{SST}$,\
+&emsp;SSE $=\Sigma_i(y_i-\hat{y})^2$,\
+&emsp;SST $=\Sigma_i(y_i-\bar{y})^2$.\
+R $^2$ is a value between 0 and 1.
 
 ## Editing guesses
 The *fano.py* uses a computer generation function *scipy.optimize.curve_fit* to find fano parameters. However, the computer requires a guess as an input to give the computation a good starting point. Sometimes these guesses aren't helpful. The only guess that is not entered by the user is $\lambda_{0}$.

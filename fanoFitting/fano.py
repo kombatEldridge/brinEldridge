@@ -58,14 +58,13 @@ def processData(x, y, lamdaF, lamdaL, gam):
     y=y/(poptsFano[3])
 
     #We then run the scaled data thought the un-augmented Fano Eq
-    popt_nfano, pcov_nfano = scipy.optimize.curve_fit(nFano, x, y, p0=[gam, x0, q], maxfev=100000)
+    popt_nfano, _ = scipy.optimize.curve_fit(nFano, x, y, p0=[gam, x0, q], maxfev=100000)
 
     #In an effort to create a measure of fitness for each Fano Fit, 
-    #we just take the vertical distance between the data point and its position on the fit curve. 
-    #Their average is the fitness.
-    #A lower fitness score, the better the fit.
-    residual = (y - (nFano(x, *popt_nfano)))**2
-    fitness = sqrt(average(residual))
+    #A higher fitness score, the better the fit (max = 1).
+    SSE = sum((y - (nFano(x, *popt_nfano)))**2)
+    SST = sum((y - average(y))**2)
+    fitness = 1-(SSE/SST)
 
     #observation: negating both Gamma and q does nothing to Fano, but makes sure Gamma is positive
     #by giving a good guess, this shouldn't happen
