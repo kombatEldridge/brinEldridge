@@ -2,21 +2,14 @@
 
 ## File Format
 This is the most important note on how to use *fano.py*.
-To begin, there are only three files that are compatible with *fano.py*:
-* AverageEspheres.txt
-* AverageEXTABS.txt
-* Orientation.txt
 
-These three files are outputs of a compiling script and are tab separated values. These files need to have values separated by **one** tab and **no** spaces.
+Files must be tab separated lists. Files to be used must have their first column be wavelengths (nm). Additional columns will be usable data. 
+
+First row in file must have column names/titles.
+
+These files need to have values separated by **one** tab and **no** spaces.
 
 Tip: open all files in Visual Studio Code and do a *Find and Replace* for any lone space characters or any doubled tab characters.
-
-## Adding new file type
-For files not of the three given types, it is possible to edit *fano.py* to accomidate the different file type. 
-* Make sure to new file is also a text file list of tab separated values. 
-* Next, the user must add another possibily of column size. The *fano.py* reads the number of columns in the text file to learn what type it is. Adding a column count for the new file will add it to the list of possible files. 
-* Finally, adding the data processing of the columns is the last step. Adding the column index of every important y data set and its name will complete the process.
-* In all, follow the format of the current code to insert the new file type.
 
 ## Fano equation
 ## &emsp; $y=\frac{\left[\left(2hc\frac{\left(\frac{1}{\lambda}-\frac{1}{\lambda_0}\right)}{\Gamma}\right)+q\right]^2}{\left(2hc\frac{\left(\frac{1}{\lambda}-\frac{1}{\lambda_0}\right)}{\Gamma}\right)^2+1}$
