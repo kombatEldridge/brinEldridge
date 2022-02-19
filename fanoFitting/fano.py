@@ -1,3 +1,4 @@
+import subprocess
 import numpy as np
 import pandas as pd
 import os
@@ -91,58 +92,15 @@ for file in os.listdir(os.getcwd()):
 filename = int(input("\nPlease select file number:"))
 path = os.getcwd() + "/" + files[filename] #path of the file
 data = pd.read_csv(path, sep='\t', header=None, skiprows=1).values
-
 columns = len(data[:][0])
-if(columns == 21):
-    fileType = 0 #AverageEspheres
-    fileTypeName = "AverageEspheres"
-    columnAmount = 4
-elif(columns == 13):
-    fileType = 1 #AverageEXTABS
-    fileTypeName = "AverageEXTABS"
-    columnAmount = 8
-elif(columns == 10):
-    fileType = 2 #Orientation
-    fileTypeName = "Orientation"
-    columnAmount = 6
-else:
-    print("Error: File type not supported. Please make sure you are inputting a file of type: AverageEspheres, AverageEXTABS, or Orientation")
-    quit()
 
 # This just takes in the data and formats it into a usable array.
-# If someone wants to add data that isn't formatted this way, just find which columns from the .txt give the y data and manually add that elif option.
 # NOTE: Make sure your file contains ONLY one tab between data points and NO space bars.
 # TIP: Open all of your data text files into Visual Studio Code and let it do a system wide "find and replace" for any double tabs or additional sapce bars.
-if(fileType == 0):
-    x = data[:,0] #Column 0 is always the wavelength #x1a
-    yData = []
-    yData.append(ySeries(data[:,6], "E^2 on the 1st nanoparticle measured longitudinally"))
-    yData.append(ySeries(data[:,10], "E^2 on the 2nd nanoparticle measured longitudinally"))
-    yData.append(ySeries(data[:,14], "E^2 on the 1st nanoparticle measured transversely"))
-    yData.append(ySeries(data[:,18], "E^2 on the 2nd nanoparticle measured transversely"))
-elif(fileType == 1):
-    x = data[:,0]  #Column 0 is always the wavelength #x2a
-    yData = []
-    yData.append(ySeries(data[:,5], "Qext on the 1st nanoparticle measured longitudinally"))
-    yData.append(ySeries(data[:,6], "Qabs on the 1st nanoparticle measured longitudinally"))
-    yData.append(ySeries(data[:,7], "Qext on the 2nd nanoparticle measured longitudinally"))
-    yData.append(ySeries(data[:,8], "Qabs on the 2nd nanoparticle measured longitudinally"))
-    yData.append(ySeries(data[:,9], "Qext on the 1st nanoparticle measured transversely"))
-    yData.append(ySeries(data[:,10], "Qabs on the 1st nanoparticle measured transversely"))
-    yData.append(ySeries(data[:,11], "Qext on the 2nd nanoparticle measured transversely"))
-    yData.append(ySeries(data[:,12], "Qabs on the 2nd nanoparticle measured transversely"))
-elif(fileType == 2):
-    x = data[:,0] #Column 0 is always the wavelength #x3a
-    yData = []
-    yData.append(ySeries(data[:,1], "Qext measured longitudinally"))
-    yData.append(ySeries(data[:,2], "Qabs measured longitudinally"))
-    yData.append(ySeries(data[:,3], "Qsca measured longitudinally"))
-    yData.append(ySeries(data[:,4], "Qext measured transversely"))
-    yData.append(ySeries(data[:,5], "Qabs measured transversely"))
-    yData.append(ySeries(data[:,6], "Qsca measured transversely"))
-else:
-    print("Error: File not formatted correctly.")
-    quit()
+x = data[:,0] #Column 0 is always the wavelength #x1a
+yData = []
+for ii in range(1, columns):
+    yData.append(ySeries(data[:, ii], "Column %d" % (ii)))
 
 # Ask the user to identify the interval in which the user thinks the fano resonance is in
 lamdaF = input("\nFirst wavelength of the interval (default: 350nm):")
@@ -163,19 +121,29 @@ else:
 
 dataRequest = ""
 yNumber = []
-print("\nProgram has detected that your file has %d data sets\n" % (columnAmount))
+print("\nProgram has detected that your file has %d data sets\n" % (columns))
 while(dataRequest != "x"):
     print("Please select which series to process (enter any other character to exit):")
-    for index in range(0, len(yData)):
-        print("[",index,"] ",yData[index].name)
+    print("[ 0 ] ","Wavelength")
+    for index in range(len(yData)):
+        print("[",index+1,"] ",yData[index].name)
         if(index not in yNumber): yNumber.append(index)
+    print("[",index+2,"] ","Print preview of text file for reference")
+    yNumber.append(index+1)
     dataRequest = input()
     try:
-        dataRequest = int(dataRequest)
+        dataRequest = int(dataRequest)-1
     except ValueError:
         quit()
     if(dataRequest not in yNumber):
         quit()
-    fano = processData(x, yData[dataRequest].values, lamdaF, lamdaL, gam)
-    print(Fore.YELLOW + "\nq = %0.5f\ngamma = %.3e\nx0 = %0.5f\na scalar = %0.5f\nFitness = %0.5f\n" % (fano[0], fano[1], fano[2], fano[5], fano[3]))
-    print(Style.RESET_ALL)
+    if(dataRequest == len(yData)):
+        print("-"*(8*(len(yData)+1)))
+        for i in range(len(yData)+1): print(i, end = '\t')
+        print()
+        print("-"*(8*(len(yData)+1)))
+        cmd = subprocess.run(["head", "-10", path], capture_output=True)
+        print(cmd.stdout.decode())
+    else:
+        fano = processData(x, yData[dataRequest].values, lamdaF, lamdaL, gam)
+        print(Fore.YELLOW + "\nq = %0.5f\ngamma = %.3e\nx0 = %0.5f\na scalar = %0.5f\nFitness = %0.5f\n" % (fano[0], fano[1], fano[2], fano[5], fano[3]) + Style.RESET_ALL)
