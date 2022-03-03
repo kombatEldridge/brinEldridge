@@ -63,6 +63,7 @@ def processData(x, y, lamdaF, lamdaL, gam):
 
     #In an effort to create a measure of fitness for each Fano Fit, 
     #A higher fitness score, the better the fit (max = 1).
+    #Although this particular calculation of R^2 is for linear models, it is sufficent for its ability to consider the average vertical distance between the data and the prediciton.
     SSE = sum((y - (nFano(x, *popt_nfano)))**2)
     SST = sum((y - average(y))**2)
     fitness = 1-(SSE/SST)
@@ -117,7 +118,7 @@ gam = input("Guess for gamma (default: 5e-21):")
 if(gam == ""):
     gam = 5e-21
 else:
-    gam = int(gam)
+    gam = float(gam)
 
 dataRequest = ""
 yNumber = []
